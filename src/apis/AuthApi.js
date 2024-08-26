@@ -3,7 +3,7 @@ import axiosInstance from "./axiosInstance";
 class AuthApi {
   static async login(username, password) {
     try {
-      const response = await axiosInstance.post("auth/login", {
+      const response = await axiosInstance.post("auth/signin", {
         username,
         password,
       });

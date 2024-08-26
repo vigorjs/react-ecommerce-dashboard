@@ -4,6 +4,8 @@ import * as z from "zod";
 
 import PageTitle from "../components/PageTitle";
 import enigmaGrowLogo from "../assets/enigma_grow.png";
+import { useAuth } from "../hooks";
+import { useNavigate } from "react-router-dom";
 
 const schema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -13,6 +15,8 @@ const schema = z.object({
 });
 
 function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -22,7 +26,8 @@ function LoginPage() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    login(data.username, data.password);
+    navigate("/dashboard");
   };
 
   return (

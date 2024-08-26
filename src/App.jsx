@@ -7,6 +7,21 @@ import {
 
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuth } from "./hooks";
+
+const DashboardPage = () => {
+  const { user } = useAuth();
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <h1>{user.name}</h1>
+      <h1>{user.email}</h1>
+      <h1>{user.role}</h1>
+      <Outlet />,
+    </div>
+  );
+};
 
 const router = createBrowserRouter([
   {
@@ -23,12 +38,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: (
-          <div>
-            <h1>Dashboard</h1>
-            <Outlet />,
-          </div>
-        ),
+        element: <DashboardPage />,
         children: [
           {
             path: "",

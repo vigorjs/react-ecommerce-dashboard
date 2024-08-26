@@ -9,8 +9,10 @@ const AuthContextProvider = AuthContext.Provider; // Component
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const decodeAndSetUser = (accessTokenParam) => {
     const jwtPayload = jwtDecode(accessTokenParam);
+
     const newUser = {
       id: jwtPayload.sub,
       username: jwtPayload.username,
@@ -21,10 +23,11 @@ export const AuthProvider = ({ children }) => {
     };
 
     setUser(newUser);
+    setIsLoading(false);
   };
 
   const loadUser = () => {
-    const accessToken = localStorage.getItem("access_token");
+    const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       decodeAndSetUser(accessToken);
     }
@@ -32,26 +35,30 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     loadUser();
+    setIsLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (username, password) => {
-    const { access_token, refresh_token } = await AuthApi.login(
+    setIsLoading(true);
+    const { accessToken, refreshToken } = await AuthApi.login(
       username,
       password
     );
-    localStorage.setItem("access_token", access_token);
-    localStorage.setItem("refresh_token", refresh_token);
-    decodeAndSetUser(access_token);
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+    decodeAndSetUser(accessToken);
   };
 
   const logout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     setUser(null);
   };
 
   const isAuthenticated = !!user;
+
+  if (isLoading) return <div>Loading ...</div>;
 
   return (
     <AuthContextProvider value={{ logout, user, isAuthenticated, login }}>
