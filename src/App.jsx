@@ -8,6 +8,7 @@ import {
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SimpleDashboardPage from "./pages/SimpleDashboardPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const HomePage = () => <h1>Home Page</h1>;
 const UsersPage = () => <h1>Users Page</h1>;
@@ -30,7 +31,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <SimpleDashboardPage />,
+        element: <DashboardPage />,
         children: [
           {
             path: "",
