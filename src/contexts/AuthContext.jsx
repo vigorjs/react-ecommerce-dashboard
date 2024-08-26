@@ -9,7 +9,7 @@ const AuthContextProvider = AuthContext.Provider; // Component
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const decodeAndSetUser = (accessTokenParam) => {
     const jwtPayload = jwtDecode(accessTokenParam);
 
@@ -30,12 +30,13 @@ export const AuthProvider = ({ children }) => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       decodeAndSetUser(accessToken);
+    } else {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     loadUser();
-    setIsLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

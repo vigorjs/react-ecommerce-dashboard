@@ -7,21 +7,13 @@ import {
 
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./hooks";
+import SimpleDashboardPage from "./pages/SimpleDashboardPage";
 
-const DashboardPage = () => {
-  const { user } = useAuth();
-
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <h1>{user.name}</h1>
-      <h1>{user.email}</h1>
-      <h1>{user.role}</h1>
-      <Outlet />,
-    </div>
-  );
-};
+const HomePage = () => <h1>Home Page</h1>;
+const UsersPage = () => <h1>Users Page</h1>;
+const ProductsPage = () => <h1>Products Page</h1>;
+const TransactionsPage = () => <h1>Transactions Page</h1>;
+const CounterPage = () => <h1>Counter Page</h1>;
 
 const router = createBrowserRouter([
   {
@@ -38,15 +30,27 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <DashboardPage />,
+        element: <SimpleDashboardPage />,
         children: [
           {
             path: "",
-            element: <h1>Welcome to Dashboard Home</h1>,
+            element: <HomePage />,
           },
           {
             path: "users",
-            element: <h1>User List</h1>,
+            element: <UsersPage />,
+          },
+          {
+            path: "products",
+            element: <ProductsPage />,
+          },
+          {
+            path: "transactions",
+            element: <TransactionsPage />,
+          },
+          {
+            path: "counter",
+            element: <CounterPage />,
           },
         ],
       },
