@@ -5,6 +5,7 @@ import { PencilIcon } from "@heroicons/react/24/outline";
 import { Pagination } from "@nextui-org/react";
 import { CloseFilledIcon, SearchIcon } from "../assets/icons";
 import { useDebounce } from "use-debounce";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
     {
@@ -40,9 +41,9 @@ const columns = [
 ]
 
 function ProductPage() {
-    const isLoading = useSelector((state) => { 
-        return state.products.isLoading
-    })
+    // const isLoading = useSelector((state) => { 
+    //     return state.products.isLoading
+    // })
     const productList = useSelector((state) => { 
         return state.products.items
     })
@@ -57,19 +58,20 @@ function ProductPage() {
     const [limit, setLimit] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
     const [debounceSearchQuery] = useDebounce(searchQuery, 700);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        ProductApi.getProduct(page, limit, debounceSearchQuery);
+        ProductApi.getProducts(page, limit, debounceSearchQuery);
     }, [page, limit, debounceSearchQuery])
 
 
-    if(isLoading){
-        return (
-            <div className="flex justify-center items-center h-full">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-            </div>
-        )
-    }
+    // if(isLoading){
+    //     return (
+    //         <div className="flex justify-center items-center h-full">
+    //             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+    //         </div>
+    //     )
+    // }
 
     if(error) {
         return <div className="text-red-600 text-center">{error}</div>
@@ -83,6 +85,16 @@ function ProductPage() {
           currency: "IDR"
         }).format(Number(price))
       }
+
+    const createProductClickHandler = () => { 
+        navigate("/dashboard/products/new")
+     }
+
+     const updateProductClickHandler = (product) => { 
+        navigate(`/dashboard/products/${product.id}`, {
+            state: {product}
+        })
+     }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -115,7 +127,7 @@ function ProductPage() {
                         </button>
   )}
                 </div>
-                <button className="flex items-center justify-center rounded-md bg-primary px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-light focused-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition duration-150 ease-in-out">
+                <button onClick={createProductClickHandler} className="flex items-center justify-center rounded-md bg-primary px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-light focused-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition duration-150 ease-in-out">
                     Add Product
                 </button>
             </div>
@@ -162,7 +174,7 @@ function ProductPage() {
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-center">
                                             <div className="flex justify-center items-center space-x-2">
-                                                <button onClick={() => { alert("edit Button Clicked") }} className="text-primary hover:text-primary-light transition duration-150 ease-in-out"><PencilIcon className="h-5 w-5"/></button>
+                                                <button onClick={() => updateProductClickHandler(productItem)} className="text-primary hover:text-primary-light transition duration-150 ease-in-out"><PencilIcon className="h-5 w-5"/></button>
                                                 <button onClick={() => { alert("edit Button Clicked") }} className="text-red-600 hover:text-red-200 transition duration-150 ease-in-out"><PencilIcon className="h-5 w-5"/></button>
                                             </div>
                                         </td>
