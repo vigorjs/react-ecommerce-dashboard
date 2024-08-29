@@ -1,9 +1,28 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v2",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1",
   timeout: 5000,
 });
+
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    if (config.url.includes("login")|| config.url.includes("register")){
+      return config;
+    }
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken){
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${accessToken}`,
+      };
+    }
+    return config;
+  }, (error) => {
+    console.log("axiosInstance.interceptors.request Error: ", error.message);
+    
+  }
+)
 
 // if backend not yet ready
 // const axiosInstance = {

@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"; // npm i @hookform/resolvers
 import * as z from "zod";
-
+import enigmaGrowLogo from '../assets/images/'
 import PageTitle from "../components/PageTitle";
-import enigmaGrowLogo from "../assets/enigma_grow.png";
 import { useAuth } from "../hooks";
 import { useNavigate } from "react-router-dom";
 
