@@ -1,5 +1,6 @@
+import toast from "react-hot-toast";
 import { setCategories } from "../redux/productCategories/productCategoriesSlice";
-import { setLoading, setProducts, addProduct, editProduct, setError } from "../redux/products/productsSlice";
+import { setLoading, setProducts, addProduct, editProduct, setError, deleteProduct } from "../redux/products/productsSlice";
 import store from "../redux/store";
 import axiosInstance from "./axiosInstance";
 import dayjs from 'dayjs'
@@ -72,10 +73,12 @@ class ProductApi {
                 headers: {"Content-Type": "multipart/form-data"},
             })
             store.dispatch(addProduct(res.data))
+            toast.success("Product created sucessfully!")
         } catch (e) {
             console.log("Error post produc:", e.message);
+            toast.error("Failed to create Product")
+        }finally {
             store.dispatch(setLoading(false));
-            
         }
     }
 
@@ -83,16 +86,32 @@ class ProductApi {
     static async updateProduct(id, productsData) {
         store.dispatch(setLoading(true))
         try {
-        const response = await axiosInstance.post(`/products/${id}`, productsData, {
-            headers: { "Content-Type" : "multipart/form-data"}
-        })
-        store.dispatch(editProduct(response.data))
-        return response.data
+            const response = await axiosInstance.put(`/products/${id}`, productsData, {
+                headers: { "Content-Type" : "multipart/form-data"}
+            })
+            store.dispatch(editProduct(response.data))
+            toast.success("Product updated sucessfully!")
         } catch(error) {
-        console.log("Error get Product", error.message);
-        store.dispatch(setError(error))
+            console.log("Error get Product", error.message);
+            store.dispatch(setError(error))
+            toast.error("Failed to update Product")
         } finally {
         store.dispatch(setLoading(false))
+        }
+    }
+
+    static async deleteProduct(id, page, limit, query) {
+        store.dispatch(setLoading(true))
+        try {
+            await axiosInstance.delete(`/products/${id}`)
+            toast.success("Product deleted sucessfully!")
+            await this.getProduct(page, limit, query)
+        } catch(error) {
+            console.log("Error get Product", error.message);
+            store.dispatch(setError(error))
+            toast.error("Failed to delete Product")
+        } finally {
+            store.dispatch(setLoading(false))
         }
     }
 }

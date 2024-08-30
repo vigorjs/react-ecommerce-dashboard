@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import ProductApi from "../apis/ProductsApi";
 import { useSelector } from "react-redux";
 import { PencilIcon } from "@heroicons/react/24/outline";
-import { Pagination } from "@nextui-org/react";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Pagination, useDisclosure } from "@nextui-org/react";
 import { CloseFilledIcon, SearchIcon } from "../assets/icons";
 import { useDebounce } from "use-debounce";
 import { useNavigate } from "react-router-dom";
@@ -59,6 +59,8 @@ function ProductPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [debounceSearchQuery] = useDebounce(searchQuery, 700);
     const navigate = useNavigate();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const [productToDeleted, setProductToDeleted] = useState(null);
 
     useEffect(() => {
         ProductApi.getProducts(page, limit, debounceSearchQuery);
@@ -73,8 +75,9 @@ function ProductPage() {
     //     )
     // }
 
-    if(error) {
-        return <div className="text-red-600 text-center">{error}</div>
+    if (error) {
+        const errorMessage = typeof error === 'object' && error.message ? error.message : JSON.stringify(error);
+        return <div className="text-red-600 text-center">{errorMessage}</div>;
     }
 
     const totalPages = Math.ceil(total / limit)
@@ -95,6 +98,16 @@ function ProductPage() {
             state: {product}
         })
      }
+
+     const deleteProductHandler = (product) => () =>{
+        setProductToDeleted(product);
+        onOpen();
+     }
+
+     const deleteHandler = (onClose) => async () => { 
+        await ProductApi.deleteProduct(productToDeleted.id, page, limit, searchQuery);
+        onClose();
+      }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -175,7 +188,7 @@ function ProductPage() {
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-center">
                                             <div className="flex justify-center items-center space-x-2">
                                                 <button onClick={() => updateProductClickHandler(productItem)} className="text-primary hover:text-primary-light transition duration-150 ease-in-out"><PencilIcon className="h-5 w-5"/></button>
-                                                <button onClick={() => { alert("edit Button Clicked") }} className="text-red-600 hover:text-red-200 transition duration-150 ease-in-out"><PencilIcon className="h-5 w-5"/></button>
+                                                <button onClick={deleteProductHandler(productItem)} className="text-red-600 hover:text-red-200 transition duration-150 ease-in-out"><PencilIcon className="h-5 w-5"/></button>
                                             </div>
                                         </td>
                                     </tr>)
@@ -199,8 +212,37 @@ function ProductPage() {
             </div>
             <Pagination total={totalPages} color="primary" page={page}  onChange={setPage} showControls showShadow={true}/>
         </div>
+
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="opaque">
+            <ModalContent>
+                {(onClose) => { 
+                    return (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">
+                                Confirm Delete
+                            </ModalHeader>
+                            <ModalBody>
+                                <p>
+                                    Are yu sure want to delete this product span{" "}
+                                    <span className="font-bold text-red-600">{`"${productToDeleted.name}`}</span>
+                                </p>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="default" variant="light" onPress={onClose} >
+                                    Cancel
+                                </Button>
+                                <Button color="danger" onPress={deleteHandler(onClose)}>
+                                    Yes, Delete
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )
+                }}
+            </ModalContent>
+        </Modal>
+
     </div>
   )
 }
 
-export default ProductPage
+export default ProductPage;

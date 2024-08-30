@@ -1,122 +1,38 @@
-import { Select, SelectItem } from "@nextui-org/react"
-import ProductFormLabel from "../components/ProductFormLabel"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { useEffect, useState } from "react";
-import ProductApi from "../apis/ProductsApi";
-import { useSelector } from "react-redux";
-import { IMAGE_PLACEHOLDER_URL } from "../constants/images.constants";
+import PropTypes from 'prop-types'
+import ProductFormLabel from '../../components/ProductFormLabel';
+import { Select, SelectItem } from '@nextui-org/react';
 
-function ProductDetailsPage() {
-  const params = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [product, setProduct] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    categoryIds: [],
-    image: null,
-    imageUrl: IMAGE_PLACEHOLDER_URL,
-  })
-  const categories = useSelector((state) => {
-    return state.productCategories.items;
-  });
-  const {id: productId} = params;
+const ProductDetailsPageComponent = (props) => {
+  const {
+    isEditForm, 
+    onsubmitHandler,
+    inputHandler,
+    categoriesHandler,
+    cancelHandler, 
+    product, 
+    categories,
+    handleImageChange, 
+    handleRemoveImage,
+    validCategoryIds,
+  } = props;
 
-  const setProductState = (product) => { 
-    setProduct((previousProductState) => { 
-      return {
-        ...previousProductState,
-        ...product,
-        categoryIds: product.categories.map((categoryItem) => categoryItem.id.toString()),
-        imageUrl: product.imageUrls && product.imageUrls.lenght > 0 
-        ? product.imageUrls[0]
-        : IMAGE_PLACEHOLDER_URL,
-
-      }
-     })
-   }
-
-   const getProductDetail = async (productId) => {
-    const productDetail = await ProductApi.getProduct(productId);
-    setProductState(productDetail);
+  ProductDetailsPageComponent.propTypes = {
+    isEditForm: PropTypes.bool.isRequired,
+    onsubmitHandler: PropTypes.func.isRequired,
+    inputHandler: PropTypes.func.isRequired,
+    categoriesHandler: PropTypes.func.isRequired,
+    cancelHandler: PropTypes.func.isRequired, 
+    handleImageChange: PropTypes.func.isRequired, 
+    handleRemoveImage: PropTypes.func.isRequired,
+    validCategoryIds: PropTypes.array.isRequired,
+    product: PropTypes.object,
+    categories: PropTypes.arrayOf(PropTypes.object)
   }
-
-  useEffect(() => { 
-    ProductApi.getCategories();
-    if (productId){
-      
-      const navigationState = location.state;
-
-      const {product} = navigationState;
-      
-      setProductState(product)
-
-      getProductDetail(productId);
-    }
-   }, [productId])
-
-  const isEditForm = !!productId 
-  
-  const cancelHandler = () => { 
-    navigate(-1)
-   }
-
-  const inputHandler = (e) => { 
-    const {name, value} = e.target;
-    setProduct((previousProduct) => {
-      return {
-        ...previousProduct,
-        [name]: value,
-      }
-    })    
-  }
-
-  const categoriesHandler = (select) => { 
-    setProduct((previousProduct) => {
-      return {
-        ...previousProduct,
-        categoryIds: [...select]
-      }
-    })
-   }
-
-   const validCategoryIds = product.categoryIds.filter(id =>
-    categories.some(category => category.id.toString() === id)
-  );  
-
-  const handleImageChange = (e) => { 
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => { 
-        setProduct((prevProduct) => {
-          return {
-            ...prevProduct,
-            image: file,
-            imageUrl: reader.result
-          }
-        })
-       }
-       reader.readAsDataURL(file);
-    }
-   }
-
-   const handleRemoveImage = () => {
-    setProduct((prevProduct) => {
-      return {
-        ...prevProduct,
-        image: null,
-        imageUrl: IMAGE_PLACEHOLDER_URL,
-      }
-    })
-   }
 
   return (
     <div className="max-w-4xl mx-auto p-5 bbg-white rounded-lg shadow-md">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">{isEditForm ? "Update Product Form" : "Create Product Form"}</h1>
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={onsubmitHandler}>
         <div className="grid grid-cols-2 gap-6">
 
           {/* column pertama */}
@@ -212,4 +128,4 @@ function ProductDetailsPage() {
   )
 }
 
-export default ProductDetailsPage
+export default ProductDetailsPageComponent

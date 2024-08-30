@@ -37,7 +37,7 @@ export const productsSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setProducts, setError, setLoading, addProduct, editProduct,  } = productsSlice.actions
+export const { setProducts, setError, setLoading, addProduct, editProduct, deleteProduct } = productsSlice.actions
 
 const {reducer: productsReducer } = productsSlice;
 
